@@ -1,0 +1,48 @@
+1  git --version
+    2  git clone https://github.com/Msocial123/PagerDuty_AIOPS_Training.git
+    3  ls
+    4  cd PagerDuty_AIOPS_Training/
+    5  ls
+    6  cd Cluster-Setup/
+    7  clear
+    8  ls
+    9  chmod 777 cluster.sh
+   10  sh cluster.sh
+   11  aws --version
+   12  eksctl -version
+   13  eksctl --version
+   14  eksctl
+   15  snap install kubectl --classic
+   16  aws configure
+   17  clear
+   18  eksctl create cluster --name murali-test-cluster   --version 1.34   --region ap-south-1   --nodegroup-name murali-test-linux   --node-type t2.medium   --nodes 2   --nodes-min 2   --nodes-max 5   --managed
+   19  aws eks update-kubeconfig --name murali-test-cluster --region ap-south-1
+   20  clear
+   21  kubectl get nodes
+   22  kubectl get pods
+   23  kubectl get deployments
+   24  kubectl get svc
+   25  cd ../..
+   26  git clone -b master https://github.com/Msocial123/Fitness_Tracker.git
+   27  clear
+   28  ls
+   29  cd Fitness_Tracker/
+   30  ls
+   31  kubectl apply -f app-deployment.yaml
+   32  kubectl apply -f mongodb-deployment.yaml
+   33  kubectl get deployments
+   34  kubectl get rs
+   35  kubectl get pods
+   36  kubectl get pods -o wide
+   37  kubectl get svc
+   38  snap install helm --classic
+   39  helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+   40  helm repo add grafana https://grafana.github.io/helm-charts
+   41  helm repo update
+   42  helm install prometheus prometheus-community/kube-prometheus-stack   --namespace monitoring --create-namespace
+   43  kubectl get pods -n monitoring
+   44  kubectl get pods -o wide -n monitoring
+   45  kubectl patch svc prometheus-kube-prometheus-prometheus -n monitoring   -p '{"spec": {"type": "LoadBalancer"}}'
+   46  helm install grafana grafana/grafana --namespace monitoring
+   47  kubectl patch svc grafana -n monitoring   -p '{"spec": {"type": "LoadBalancer"}}'
+   48  kubectl get svc -n monitoring
