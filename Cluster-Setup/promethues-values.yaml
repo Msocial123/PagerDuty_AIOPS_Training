@@ -1,0 +1,43 @@
+# ------------------------------------------------------------
+# Alertmanager → PagerDuty Configuration
+# ------------------------------------------------------------
+alertmanager:
+  config:
+    global:
+      resolve_timeout: 5m
+
+    route:
+      receiver: pagerduty-prod
+      group_by:
+        - alertname
+        - namespace
+        - service
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 4h
+      routes:
+        - matchers:
+            - severity="critical"
+          receiver: pagerduty-prod
+
+    receivers:
+      - name: pagerduty-prod
+        pagerduty_configs:
+          - routing_key: ecc56712a2504808c0f4321b8faef5fc
+            severity: critical
+            send_resolved: true
+
+# ------------------------------------------------------------
+# FIX 1: Disable Admission Webhook Patching (Helm Conflict)
+# ------------------------------------------------------------
+prometheusOperator:
+  admissionWebhooks:
+    patch:
+      enabled: false
+
+# ------------------------------------------------------------
+# FIX 2: Match Existing Prometheus Service Type (IMPORTANT)
+# ------------------------------------------------------------
+prometheus:
+  service:
+    type: LoadBalancer
