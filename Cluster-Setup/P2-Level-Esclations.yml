@@ -1,0 +1,75 @@
+# ------------------------------------------------------------
+# Alertmanager → PagerDuty / Email Configuration
+# ------------------------------------------------------------
+alertmanager:
+  config:
+    global:
+      resolve_timeout: 5m
+
+    route:
+      receiver: pagerduty-prod
+      group_by:
+        - alertname
+        - namespace
+        - service
+        - environment
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 4h
+
+      routes:
+        # -------------------------------
+        # P1 – Production Critical Alerts
+        # -------------------------------
+        - matchers:
+            - severity="critical"
+            - environment="prod"
+          receiver: pagerduty-prod
+
+        # -------------------------------
+        # P2 – Warning Alerts (Email)
+        # -------------------------------
+        - matchers:
+            - severity="warning"
+          receiver: email-notifications
+
+    receivers:
+      # -------------------------------
+      # PagerDuty Receiver (P1)
+      # -------------------------------
+      - name: pagerduty-prod
+        pagerduty_configs:
+          - routing_key: ecc56712a2504808c0f4321b8faef5fc
+            severity: critical
+            send_resolved: true
+            details:
+              runbook_url: https://wiki/runbooks/pod-crash
+              platform: kubernetes
+              team: sre
+
+      # -------------------------------
+      # Email Receiver (P2)
+      # -------------------------------
+      - name: email-notifications
+        email_configs:
+          - to: sre-team@company.com
+            from: alertmanager@company.com
+            smarthost: smtp.company.com:587
+            auth_username: alertmanager@company.com
+            auth_password: SMTP_PASSWORD
+            require_tls: true
+
+# ------------------------------------------------------------
+# FIX 1: Disable Admission Webhook Patching (Helm Conflict)
+# ------------------------------------------------------------
+prometheusOperator:
+  admissionWebhooks:
+    patch:
+      enabled: false
+
+# ------------------------------------------------------------
+# FIX 2: Match Existing Prometheus Service Type
+# ------------------------------------------------------------
+prometheus:
+  service:
+    type: LoadBalancer
